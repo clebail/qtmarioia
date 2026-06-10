@@ -14,16 +14,25 @@ public:
     ~MainWindow();
 private:
     Gamepad *gamepad;
-    QTimer *timer;
+    QTimer *timer, *captureTimer;
+    WId snes9xWid;
 private slots:
-    void on_pbA_clicked();
-    void on_pbB_clicked();
-    void on_pbX_clicked();
-    void on_pbY_clicked();
-    void on_pbTL_clicked();
-    void on_pbTR_clicked();
-    void on_pbStart_clicked();
-    void on_pbSelect_clicked();
+    void on_pbA_pressed();
+    void on_pbA_released();
+    void on_pbB_pressed();
+    void on_pbB_released();
+    void on_pbX_pressed();
+    void on_pbX_released();
+    void on_pbY_pressed();
+    void on_pbY_released();
+    void on_pbTL_pressed();
+    void on_pbTL_released();
+    void on_pbTR_pressed();
+    void on_pbTR_released();
+    void on_pbStart_pressed();
+    void on_pbStart_released();
+    void on_pbSelect_pressed();
+    void on_pbSelect_released();
 
     void on_pbUp_pressed();
     void on_pbUp_released();
@@ -34,6 +43,9 @@ private slots:
     void on_pbRight_pressed();
     void on_pbRight_released();
 
+    void on_pbSnes9x_clicked();
+
     void onTimer();
+    void capture();
 };
 #endif // MAINWINDOW_H

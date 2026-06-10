@@ -14,7 +14,6 @@ class Gamepad {
 public:
     static Gamepad *getInstance();
 
-    bool send(__u16 code);
     bool sendPress(__u16 code);
     bool sendRelease(__u16 code);
 private:

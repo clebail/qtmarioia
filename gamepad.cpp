@@ -80,18 +80,3 @@ bool Gamepad::sendRelease(__u16 code) {
     return false;
 }
 
-bool Gamepad::send(__u16 code) {
-    if(fd != -1) {
-        suinput_emit(fd, EV_KEY, code, 1);
-        suinput_syn(fd);
-        usleep(16000); // hold for ~1 snes9x frame so SDL sees the press
-        suinput_emit(fd, EV_KEY, code, 0);
-        suinput_syn(fd);
-
-        qDebug() << "send" << code;
-
-        return true;
-    }
-
-    return false;
-}

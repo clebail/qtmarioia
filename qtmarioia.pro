@@ -30,4 +30,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 unix: CONFIG += link_pkgconfig
 
-unix|win32: LIBS += -ludev
+unix|win32: LIBS += -ludev -lX11 -lXcomposite
