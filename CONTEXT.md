@@ -26,9 +26,11 @@ Construire une IA qui joue à un jeu SNES via snes9x. Ce dépôt est le point de
 
 ### Capture vidéo (`mainwindow.cpp`)
 - Capture via **XComposite** (`XCompositeRedirectWindow` + `XCompositeNameWindowPixmap` + `XGetImage`)
-- Rafraîchissement toutes les 16ms (~60fps) via `QTimer`
+- Rafraîchissement toutes les 33ms (~30fps) via `QTimer`
 - Conversion `XImage → QImage → QPixmap` affichée dans `lblCapture`
-- `XCloseDisplay` à chaque frame (connexion ouverte/fermée par tick)
+- `Display*` ouvert une seule fois dans le constructeur (`captureDpy`), fermé dans le destructeur
+- `XCompositeRedirectWindow` appelé une seule fois dans `on_pbSnes9x_clicked()`
+- **CPU encore élevé (~12.6%)** : `XGetImage` copie toute la pixmap via socket X11 à chaque frame — prochain fix : **MIT-SHM (`XShmGetImage`)** et/ou vérifier la résolution capturée vs 256×224 natif SNES
 
 ### Points techniques importants
 - **Press + release dans le même sync frame = input ignoré par SDL/snes9x** — toujours séparer par un `EV_SYN`

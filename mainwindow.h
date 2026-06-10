@@ -15,7 +15,8 @@ public:
 private:
     Gamepad *gamepad;
     QTimer *timer, *captureTimer;
-    WId snes9xWid;
+    WId snes9xWid = 0;
+    void *captureDpy = nullptr;
 private slots:
     void on_pbA_pressed();
     void on_pbA_released();

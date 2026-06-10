@@ -66,14 +66,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     timer->start();
 
+    captureDpy = XOpenDisplay(nullptr);
+
     captureTimer = new QTimer(this);
-    captureTimer->setInterval(16);
+    captureTimer->setInterval(33);
     connect(captureTimer, SIGNAL(timeout()), this, SLOT(capture()));
     captureTimer->start();
 }
 
 MainWindow::~MainWindow() {
     delete timer;
+    if (captureDpy)
+        XCloseDisplay((Display *)captureDpy);
 }
 
 void MainWindow::on_pbA_pressed()      { gamepad->sendPress(BTN_A); }
@@ -125,28 +129,27 @@ void MainWindow::onTimer() {
 }
 
 void MainWindow::on_pbSnes9x_clicked() {
-    Display *dpy = XOpenDisplay(nullptr);
+    Display *dpy = (Display *)captureDpy;
     snes9xWid = findWindow(dpy, DefaultRootWindow(dpy), "Super Mario All-Stars (Europe) - Snes9x");
-    XCloseDisplay(dpy);
+    if (snes9xWid)
+        XCompositeRedirectWindow(dpy, snes9xWid, CompositeRedirectAutomatic);
 }
 
 void MainWindow::capture() {
-    if(snes9xWid) {
-        Display *dpy = XOpenDisplay(nullptr);
-        XWindowAttributes attrs;
-        XGetWindowAttributes(dpy, snes9xWid, &attrs);
-        XCompositeRedirectWindow(dpy, snes9xWid, CompositeRedirectAutomatic);
-        Pixmap pix = XCompositeNameWindowPixmap(dpy, snes9xWid);
-        XImage *img = XGetImage(dpy, pix, 0, 0, attrs.width, attrs.height, AllPlanes, ZPixmap);
-        if (img) {
-            QImage frame((uchar *)img->data, attrs.width, attrs.height,
-                         img->bytes_per_line, QImage::Format_RGB32);
-            lblCapture->setPixmap(QPixmap::fromImage(
-                frame.scaled(lblCapture->size(), Qt::KeepAspectRatio, Qt::FastTransformation)
-            ));
-            XDestroyImage(img);
-        }
-        XFreePixmap(dpy, pix);
-        XCloseDisplay(dpy);
+    if (!snes9xWid || !captureDpy)
+        return;
+    Display *dpy = (Display *)captureDpy;
+    XWindowAttributes attrs;
+    XGetWindowAttributes(dpy, snes9xWid, &attrs);
+    Pixmap pix = XCompositeNameWindowPixmap(dpy, snes9xWid);
+    XImage *img = XGetImage(dpy, pix, 0, 0, attrs.width, attrs.height, AllPlanes, ZPixmap);
+    if (img) {
+        QImage frame((uchar *)img->data, attrs.width, attrs.height,
+                     img->bytes_per_line, QImage::Format_RGB32);
+        lblCapture->setPixmap(QPixmap::fromImage(
+            frame.scaled(lblCapture->size(), Qt::KeepAspectRatio, Qt::FastTransformation)
+        ));
+        XDestroyImage(img);
     }
+    XFreePixmap(dpy, pix);
 }
