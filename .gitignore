@@ -1,0 +1,9 @@
+Makefile
+*.o
+ui_*.*
+moc_*.*
+qtmarioia
+qtmarioia.pro.user
+qtmarioia.pro.user.*
+.qmake.stash
+
